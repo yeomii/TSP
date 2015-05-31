@@ -15,7 +15,6 @@ namespace Crossover
 
 	string getString(Crossover);
 
-	void PMX(int* p1, int* p2, int* c, int size);
 	C2EdgeTour PMX(C2EdgeTour& p1, C2EdgeTour& p2);
 	C2EdgeTour EdgeRecombination(C2EdgeTour& p1, C2EdgeTour& p2);
 }
