@@ -61,6 +61,7 @@ int             gType;          /* is Symmetric or Asysmmetric ? */
 int             gNumNN;         /* is # of nearest neighbors */
 double*            gDistMat;       /* distance matrix */
 int*            gNNI;           /* is nearest neighbors arrrays */
+long long 			gTimeLimit;			/* running time limit */
 
 	/********************* Internal Global Varialbes ********************/
 POINT*          gNodeCoords;    /* When NODE_COORD_SECTION exists, used */
@@ -112,49 +113,32 @@ void ReadTspFile(char* graphname)
 	trace("Entering ReadTspFile\n");
 	tsplib_dir = getenv("TSPLIB_DIR");
 
-	strcpy(graph, graphname);  // try to find out in the current directory.
-	fd = fopen(graph, "r");
-	if( !fd && tsplib_dir) // try to find out in the specified directory.
+	if (graphname == NULL)
 	{
-		sprintf(graph, "%s/%s", tsplib_dir, graphname);
-		fd = fopen(graph, "r");
+		fd = stdin;
 	}
-	if( !fd && tsplib_dir) // try to find out in the second spec. dir.
+	else
 	{
-		sprintf(graph, "%s/MYLIB/%s", tsplib_dir, graphname);
+		strcpy(graph, graphname);  // try to find out in the current directory.
 		fd = fopen(graph, "r");
+		if( !fd && tsplib_dir) // try to find out in the specified directory.
+		{
+			sprintf(graph, "%s/%s", tsplib_dir, graphname);
+			fd = fopen(graph, "r");
+		}
+		if( !fd && tsplib_dir) // try to find out in the second spec. dir.
+		{
+			sprintf(graph, "%s/MYLIB/%s", tsplib_dir, graphname);
+			fd = fopen(graph, "r");
+		}
+		if( !fd) Error(" %s data file not found..\n", graph);
 	}
-	if( !fd) Error(" %s data file not found..\n", graph);
-
 	GetTspFileInfo(fd, &gtfi, dummy);
 
 	gNumCity = gtfi.nDimension;
-/*
-	if( strcmp(gtfi.szEdgeWeightType, "EXPLICIT")!=0 &&
-		strcmp(gtfi.szEdgeWeightType, "EUC_2D")!=0 &&
-		strcmp(gtfi.szEdgeWeightType, "EUC_3D")!=0 &&
-		strcmp(gtfi.szEdgeWeightType, "EUC_ND")!=0 &&
-		strcmp(gtfi.szEdgeWeightType, "CEIL_2D")!=0 &&
-		strcmp(gtfi.szEdgeWeightType, "GEO")!=0 &&
-		strcmp(gtfi.szEdgeWeightType, "ATT")!=0)
-		Error(" not supported EDGE_WEIGHT_TYPE : %s\n", gtfi.szEdgeWeightType);
 
-	if( strcmp(gtfi.szEdgeWeightType, "EXPLICIT")==0 &&
-		strcmp(gtfi.szEdgeWeightFormat, "FULL_MATRIX")!=0)
-		Error(" not supported EDGE_WEIGHT_FORMAT with EXPLICIT type: %s\n",
-			   gtfi.szEdgeWeightFormat);
-
-	if( strncmp(dummy, "NODE_COORD_SECTION", 18) == 0)
-		ReadDataInNodeCoord(fd, &gtfi);
-	else if( strncmp(dummy, "EDGE_WEIGHT_SECTION", 19) == 0)
-		ReadDataInEdgeWeight(fd, &gtfi);
-	else
-		Error(" unimplemented section ... %s\n", dummy);
-
-	fclose(fd);
-	gType = (strcmp(gtfi.szType, "ATSP")==0 ? TYPE_ATSP : TYPE_STSP);
-*/
 	ReadDataInNodeCoord(fd, &gtfi);
+	fscanf(fd, "%d", &gTimeLimit);
 	gType = TYPE_STSP;
 	trace("Quitting ReadTspFile\n");
 }
@@ -237,28 +221,7 @@ void ReadDataInNodeCoord(FILE* fd, TSP_FILE_INFO* tfi)
 
 	trace("Entering ReadDataInNodeCoord\n");
 	n = tfi->nDimension;
-	/*
-	if( strcmp(tfi->szEdgeWeightType, "EUC_2D")==0)
-		ComputeDist = GetEuc2DDist;
-	else if( strcmp(tfi->szEdgeWeightType, "EUC_3D")==0)
-	{
-		ComputeDist = GetEuc3DDist;
-		tfi->nCoordDim = 3;
-	}
-	else if( strcmp(tfi->szEdgeWeightType, "EUC_ND")==0)
-		ComputeDist = GetEucNDDist;
-	else if( strcmp(tfi->szEdgeWeightType, "CEIL_2D")==0)
-		ComputeDist = GetCeil2DDist;
-	else if( strcmp(tfi->szEdgeWeightType, "GEO")==0)
-		ComputeDist = GetGeoDist;
-	else if( strcmp(tfi->szEdgeWeightType, "ATT")==0)
-		ComputeDist = GetAttDist;
-	else
-		Error("Error : In ReadDataInNodeCoord()%s\n", "");
-	if( tfi->nCoordDim<=0) tfi->nCoordDim = 2;
-	if( tfi->nCoordDim>MAX_COORD_SYSTEM)
-		Error("Error : Too Large Coord. Dimension%s\n", "");
-*/
+
 	gNodeCoords = new POINT[n];
 	tfi->nCoordDim = 2;
 	ComputeDist = GetEuc2DDist;
@@ -373,49 +336,6 @@ void PrintTour(FILE* fd, int* tour, int size,
 
 void GetTspFileInfo(FILE* fd, TSP_FILE_INFO* tfi, char* nextl)
 {
-//	char buf[1024], keyword[64], value[128], dummy[128];
-//	int n;
-//
-//	trace("Entering GetTspFileInfo\n");
-//	memset(tfi, 0, sizeof(*tfi));
-//	
-//	while( 1)
-//	{
-//		fgets(buf, 1023, fd);
-//		if( buf[strlen(buf)-1] == '\n')
-//			buf[strlen(buf)-1] = 0;
-//		n = sscanf(buf, "%s%s%s", keyword, dummy, value);
-//		if( n == 1) /* This is not of the specification part. */
-//		{
-//			strcpy(nextl, buf);
-//			/*if( nextl[strlen(nextl)-1] == '\n')
-//				nextl[strlen(nextl)-1] = 0;*/
-//			trace("Quitting GetTspFileInfo\n");
-//			return;
-//		}
-//		else if( n==2) /* keyword contains <keyword> following by ":". */
-//		{              /* so, dummy contains <value>. fix!! */
-//			keyword[strlen(keyword)-1] = 0; /* remove ":" */
-//			strcpy(value, dummy);
-//		}
-//		/*if( value[strlen(value)-1] == '\n')
-//			value[strlen(value)-1] = 0;*/
-//		
-//		if( strcmp(keyword, "NAME")==0) strcpy(tfi->szGraphName, value);
-//		else if( strcmp(keyword, "TYPE")==0) strcpy(tfi->szType, value);
-//		else if( strcmp(keyword, "COMMENT")==0) strcpy(tfi->szComment, buf);
-//		else if( strcmp(keyword, "COMMENT:")==0) strcpy(tfi->szComment, buf);
-//		else if( strcmp(keyword, "DIMENSION")==0) tfi->nDimension = atoi(value);
-//		else if( strcmp(keyword, "COORD_DIM")==0) tfi->nCoordDim = atoi(value);
-//		else if( strcmp(keyword, "GRAPH_TYPE")==0) strcpy(tfi->szGraphType, value);
-//		else if( strcmp(keyword, "EDGE_TYPE")==0) strcpy(tfi->szEdgeType, value);
-//		else if( strcmp(keyword, "EDGE_WEIGHT_TYPE")==0) strcpy(tfi->szEdgeWeightType, value);
-//		else if( strcmp(keyword, "EDGE_WEIGHT_FORMAT")==0) strcpy(tfi->szEdgeWeightFormat, value);
-//		else if( strcmp(keyword, "EDGE_DATA_FORMAT")==0) strcpy(tfi->szEdgeDataFormat, value);
-//		else if( strcmp(keyword, "NODE_TYPE")==0) strcpy(tfi->szNodeType, value);
-//		else if( strcmp(keyword, "NODE_COORD_TYPE")==0) strcpy(tfi->szNodeCoordType, value);
-//		else if( strcmp(keyword, "DISPLAY_DATA_TYPE")==0) strcpy(tfi->szDisplayDataType, value);
-//	}
 	fscanf(fd,"%d",&(tfi->nDimension));
 //	tfi->nDimension++;
 }

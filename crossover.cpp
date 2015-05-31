@@ -18,7 +18,7 @@ namespace crossover
 		return dic[(int)crossover];
 	}
 
-	void PMX(int* p1, int* p2, int* c, int size)
+	void pmx(int* p1, int* p2, int* c, int size)
 	{
 		int left = rand() % size;
 		int right = (left + (rand() % (size - 1))) % size;
@@ -44,13 +44,13 @@ namespace crossover
 		}
 	}
 
-	C2EdgeTour PMX(C2EdgeTour& p1, C2EdgeTour& p2)
+	C2EdgeTour pmx(C2EdgeTour& p1, C2EdgeTour& p2)
 	{
 		int size = p1.getSize();
 		p1.convertToOrder(_p1, size);
 		p2.convertToOrder(_p2, size);
 
-		PMX(_p1, _p2, _c, size);
+		pmx(_p1, _p2, _c, size);
 
 		C2EdgeTour ret(size);
 		ret.convertFromOrder(_c, size);

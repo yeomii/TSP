@@ -15,8 +15,8 @@ namespace crossover
 
 	string getString(Crossover);
 
-	C2EdgeTour PMX(C2EdgeTour& p1, C2EdgeTour& p2);
-	C2EdgeTour EdgeRecombination(C2EdgeTour& p1, C2EdgeTour& p2);
+	C2EdgeTour pmx(C2EdgeTour& p1, C2EdgeTour& p2);
+	C2EdgeTour edgeRecombination(C2EdgeTour& p1, C2EdgeTour& p2);
 }
 
 #endif
