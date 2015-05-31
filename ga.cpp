@@ -10,7 +10,7 @@
 
 extern long long gTimeLimit;
 
-int Psize;
+int Psize = 50;
 int Generation = 0;
 time_t BeginTime;
 C2EdgeTour *Record;
@@ -18,17 +18,19 @@ C2EdgeTour *Record;
 void GA()
 {
   CLK* lk;
-  C2EdgeTour population[MAXPSIZE];
+  C2EdgeTour** population = new C2EdgeTour*[MAXPSIZE];
   Record = new C2EdgeTour(gNumCity);
   lk = new CLK(gNumCity, gNumNN);
 
   /* generate initial population */
   for (int i=0; i<Psize; i++)
   {
-    population[i] = C2EdgeTour(gNumCity);
-    population[i].makeRandomTour();
-    population[i].evaluate();
+    population[i] = new C2EdgeTour(gNumCity);
+    population[i]->makeRandomTour();
+    population[i]->evaluate();
   }
+  Record = population[0];
+  Record->evaluate();
 
   while(1)
   {
@@ -37,9 +39,10 @@ void GA()
     C2EdgeTour *c = new C2EdgeTour(gNumCity);
     C2EdgeTour *p1, *p2;
 
+    c->makeRandomTour();
+
     // selection
     // crossover
-    c = p1;
     // mutation 1
     lk->run(c);
     // mutation 2
@@ -49,6 +52,7 @@ void GA()
     // replacement
 
     Generation++;
+    break;
   }
 }
 
@@ -58,17 +62,20 @@ void answer(FILE* fp)
   Record->convertToOrder(OrderedPath, gNumCity);
 
   for (int i=0; i<gNumCity; i++)
-    fprintf(fp, "%d", OrderedPath[i]+1);
+    fprintf(fp, "%d ", OrderedPath[i]+1);
   
-  fprintf(fp, "\n%f\n", Record->getLength());
+  fprintf(fp, "\n%lf\n", Record->getLength());
 }
 
 int main(int argc, char* argv[])
 {
-  // TODO : stdin으로 입력받기
-  ReadTspFile((char *)"cycle.in"); ConstructNN(20);
+  BeginTime = time(NULL);
 
-  srandom(time(0));
+  // TODO : stdin으로 입력받기
+  ReadTspFile((char *)"cycle.in"); 
+  ConstructNN(20);
+
+  srand(time(0));
 
   GA();
 

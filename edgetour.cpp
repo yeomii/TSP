@@ -84,7 +84,7 @@ void CTour::makeRandomOrderTour(int* dest, int size)
 	
 	for( i=0; i<size/2; i++)
 	{
-		j = random()%size; k = random()%size;
+		j = rand()%size; k = rand()%size;
 		SWAP(dest[j], dest[k], t);
 	}
 }
@@ -281,7 +281,7 @@ int C2EdgeTour::isBetween(int prev, int cur, int city, int end)
 	return FALSE;
 }
 
-int C2EdgeTour::convertFromOrder(int* src, int size)
+void C2EdgeTour::convertFromOrder(int* src, int size)
 {
 	affirm(size == m_size);
 	int i;
@@ -358,7 +358,7 @@ void C2EdgeTour::connectRandom(C2EdgeTour* tabu)
 
 	for( i=0; i<nv/2; i++)
 	{
-		j = random()%nv; k = random()%nv;
+		j = rand()%nv; k = rand()%nv;
 		SWAP(av[j], av[k], tt);
 	}
 	rne = size - getNumEdge(); // we must add the rne number of edges.

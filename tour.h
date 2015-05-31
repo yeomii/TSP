@@ -41,7 +41,7 @@ public:
 			@param src order형식의 투어
 			@param size src의 크기. #m_size#와 같아야 한다.
 		*/
-	virtual int  convertFromOrder(int* src, int size)=0;
+	virtual void convertFromOrder(int* src, int size)=0;
 
 		// two-change를 하는 함수
 	virtual void make2Change(int v1, int n1, int v2, int n2) {}
@@ -58,7 +58,7 @@ public:
 		// 도시의 개수를 리턴한다.
 	int          getSize() { return m_size; };
 		// 투어 비용을 반환한다.
-	int          getLength() { return m_length; };
+	double       getLength() { return m_length; };
 		// 에지를 나열하기 위해서 준비한다. 도시 start부터 시작한다.
 	void         enumEdgeFirst(int start);
 		/** 다음 에지를 반환한다.
@@ -121,7 +121,7 @@ public:
 	void        findFirst(int start);
 	int         findNext();
 	int         isTour();
-	int         convertFromOrder(int* src, int size);
+	void        convertFromOrder(int* src, int size);
 	void        make2Change(int v1, int n1, int v2, int n2);
 	void        make3Change(int v1, int n1, int v2, int n2,
 							int v3, int n3);

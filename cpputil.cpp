@@ -5,7 +5,6 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <unistd.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <math.h>
@@ -22,19 +21,21 @@
 	/************************ CTimer class *****************************/
 void CTimer::start()
 {
-    m_elapsedStart = times(&m_start);
+  m_start = system_clock::now();
+  m_elapsedStart = system_clock::now();
 }
 
 float CTimer::stop(int want)
 {
-	float       interval, clk_tick;
+	float interval, clk_tick;
 
-	m_elapsedEnd = times(&m_end);
-	clk_tick     = sysconf(_SC_CLK_TCK);
+  m_end = system_clock::now();
+  m_elapsedEnd = system_clock::now();
+
 	if( want == 0) 
-		interval = (float)(m_end.tms_utime-m_start.tms_utime)/clk_tick;
+		interval = duration_cast<milliseconds>(m_end - m_start).count();
 	else
-		interval = (float)(m_elapsedEnd - m_elapsedStart)/clk_tick;
+    interval = duration_cast<milliseconds>(m_end - m_start).count();
 
 	return interval;
 }
@@ -42,13 +43,13 @@ float CTimer::stop(int want)
 float CTimer::report(int want)
 {
 	float       interval, clk_tick;
-	
+  /*
 	clk_tick     = sysconf(_SC_CLK_TCK);
 	if( want == 0) 
 		interval = (float)(m_end.tms_utime-m_start.tms_utime)/clk_tick;
 	else
 		interval = (float)(m_elapsedEnd - m_elapsedStart)/clk_tick;
-	
+	*/
 	return interval;
 }
 
