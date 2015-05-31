@@ -3,3 +3,10 @@
 *.out
 *.stdout
 *.stderr
+
+*.opensdf
+*.sdf
+*.sln
+*.suo
+*.vcxproj
+*.vcxproj.filters
