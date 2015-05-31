@@ -5,7 +5,7 @@
 #include "lk.h"
 using namespace std;
 
-namespace Crossover
+namespace crossover
 {
 	enum Crossover
 	{
