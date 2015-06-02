@@ -56,9 +56,9 @@ public:
 		/// 투어 비용을 계산한다.
 	double evaluate();
 		// 도시의 개수를 리턴한다.
-	int          getSize() { return m_size; };
+	int          getSize() const { return m_size; };
 		// 투어 비용을 반환한다.
-	double       getLength() { return m_length; };
+	double       getLength() const { return m_length; };
 		// 에지를 나열하기 위해서 준비한다. 도시 start부터 시작한다.
 	void         enumEdgeFirst(int start);
 		/** 다음 에지를 반환한다.
@@ -108,6 +108,8 @@ public:
 	C2EdgeTour(int size);
 		// 2단계 생성자
 	C2EdgeTour();
+  
+  C2EdgeTour(const C2EdgeTour& src);
 		// 투어의 구조를 생성한다. 
 	void       create(int size);
 	~C2EdgeTour();
@@ -156,6 +158,8 @@ public:
 	void        setMultiGraphFlag(int flag);
 		// src 투어를 이 투어에 복사한다.
 	const C2EdgeTour& operator=(const C2EdgeTour& src);
+    // 정렬용
+  bool C2EdgeTour::operator<(const C2EdgeTour& another);
 
 		/* 도시 cur와 end사이에 city가 있는가?.
 		   투어를 prev에서 cur로 가는 방향성 투어라고 가정할 때,

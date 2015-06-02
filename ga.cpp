@@ -1,86 +1,116 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include <assert.h>
+#include <vector>
+#include <chrono>
 #include "lk.h"
 #include "cpputil.h"
-#include "crossover.h"
+#include "ga.h"
+#include <iostream>
 
-#define MAXPSIZE 100
+#define affirm(x)    assert(x)
+
+using namespace std;
+using namespace chrono;
 
 extern long long gTimeLimit;
+extern vector<C2EdgeTour> Population = vector<C2EdgeTour>();
+
+C2EdgeTour *Record;
+
+const int MAXPSIZE = 100;
 
 int Psize = 50;
 int Generation = 0;
-time_t BeginTime;
-C2EdgeTour *Record;
+
+system_clock::time_point BeginTime;
+
+inline long long elapsedTime()
+{
+  auto now = system_clock::now();
+  return duration_cast<seconds>(now - BeginTime).count();
+}
+
+inline void startTimer()
+{
+  BeginTime = system_clock::now();
+}
 
 void GA()
 {
-  CLK* lk;
-  C2EdgeTour** population = new C2EdgeTour*[MAXPSIZE];
+  /* initialize */
+  CLK* lk = new CLK(gNumCity, gNumNN);
+  Population.swap(vector<C2EdgeTour>());
   Record = new C2EdgeTour(gNumCity);
-  lk = new CLK(gNumCity, gNumNN);
 
-  /* generate initial population */
+  /* generate initial random population */
   for (int i=0; i<Psize; i++)
   {
-    population[i] = new C2EdgeTour(gNumCity);
-    population[i]->makeRandomTour();
-    population[i]->evaluate();
+    C2EdgeTour tour(gNumCity);
+    tour.makeRandomTour();
+    tour.evaluate();
+    Population.push_back(tour);
   }
-  Record = population[0];
-  Record->evaluate();
 
-  while(1)
+  /* ga loop */
+  while (elapsedTime() <= gTimeLimit - 1)
   {
-    if (time(NULL) - BeginTime >= gTimeLimit - 1) return;
+    C2EdgeTour *p1, *p2, *c;
 
-    C2EdgeTour *c = new C2EdgeTour(gNumCity);
-    C2EdgeTour *p1, *p2;
-
-    c->makeRandomTour();
-
-    // selection
-    // crossover
-    // mutation 1
+    selection(p1, p2);
+    
+    crossover(p1, p2, c);
+    
+    mutation(c, elapsedTime());
+    
     lk->run(c);
-    // mutation 2
+
     c->evaluate();
-    if (c->getLength() < Record->getLength())
-      Record = c;
-    // replacement
+    
+    replacement(p1, p2, c);
+
+    // renew best
+    if (Record->getLength() == -1 || c->getLength() < Record->getLength())
+      *Record = *c;
+
+    delete c;
 
     Generation++;
-    break;
   }
+
 }
 
-void answer(FILE* fp)
+void writeAnswer(const char* filename)
 {
-  int *OrderedPath = new int[gNumCity];
-  Record->convertToOrder(OrderedPath, gNumCity);
+  FILE* fout = fopen(filename, "w");
+
+  int *orderedPath = new int[gNumCity];
+  Record->convertToOrder(orderedPath, gNumCity);
 
   for (int i=0; i<gNumCity; i++)
-    fprintf(fp, "%d ", OrderedPath[i]+1);
+    fprintf(fout, "%d ", orderedPath[i] + 1);
   
-  fprintf(fp, "\n%lf\n", Record->getLength());
+  fprintf(fout, "\n%lf\n", Record->getLength());
+}
+
+void init()
+{
+  startTimer();
+  srand(time(0));
+  initParameters(NULL);
 }
 
 int main(int argc, char* argv[])
 {
-  BeginTime = time(NULL);
+  init();
 
-  // TODO : stdin으로 입력받기
-  ReadTspFile((char *)"cycle.in"); 
+  ReadTspFile("cycle.in"); 
   ConstructNN(20);
-
-  srand(time(0));
 
   GA();
 
-  FILE *fout = fopen("cycle.out", "w");
-  answer(fout);
+  writeAnswer("cycle.out");
 
   return 0;
 }

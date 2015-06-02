@@ -56,9 +56,9 @@ void CLK::run(C2EdgeTour* tour, C2EdgeTour* p1, C2EdgeTour* p2,
 			  C2EdgeTour* best, C2EdgeTour* worst, C2EdgeTour* other)
 {
 	trace("Entering CLK::run\n");
-    int     t1, improved;
+  int t1, improved;
 	
-    m_lookbitQueue.construct(tour, p1, p2);
+  m_lookbitQueue.construct(tour, p1, p2);
 
 	m_tour = tour;
 	
@@ -68,9 +68,9 @@ void CLK::run(C2EdgeTour* tour, C2EdgeTour* p1, C2EdgeTour* p2,
 		/* run LK */
 	m_segTree.setupCityOrder(m_tour);
 	improved = 1;
-    while( (t1 = m_lookbitQueue.deleteLookbit())>=0)
+  while( (t1 = m_lookbitQueue.deleteLookbit())>=0)
 	{
-        if( do_lk_search(t1, improved)>EPS)
+    if( do_lk_search(t1, improved)>EPS)
 		{
 			improved++;
 			m_segTree.setupCityOrder(m_tour);

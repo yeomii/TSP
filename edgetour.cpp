@@ -9,10 +9,10 @@
 #include "tour.h"
 
 	////////////////////////////// DEBUG /////////////////////////////////
-#define affirm(x)
+//#define affirm(x)
 #define trace
 
-//#define affirm(x)    assert(x)
+#define affirm(x)    assert(x)
 	//#define trace        printf
 
 	/**********************************************************************/
@@ -101,6 +101,18 @@ C2EdgeTour::C2EdgeTour()
 	m_size = 0; m_e1 = m_e2 = NULL;
 }
 
+C2EdgeTour::C2EdgeTour(const C2EdgeTour& src)
+{
+  m_size = src.m_size;
+  
+  m_e1 = new int[m_size];
+  m_e2 = new int[m_size];
+  memcpy(m_e1, src.m_e1, sizeof(int)*m_size);
+  memcpy(m_e2, src.m_e2, sizeof(int)*m_size);
+
+  m_length = src.m_length;
+}
+
 C2EdgeTour::~C2EdgeTour()
 {
 	delete[] m_e1;
@@ -130,10 +142,9 @@ void C2EdgeTour::makeRandomTour()
 	for( i=0; i<m_size; i++)
 		m_e1[i] = m_e2[i] = -1;
 	
-	for( i=0; i<m_size-1; i++)
-		addEdge(order_array[i], order_array[i+1]);
+  for (i = 0; i < m_size - 1; i++)
+    addEdge(order_array[i], order_array[i + 1]);
 	addEdge(order_array[0], order_array[m_size-1]);
-	delete[] order_array;
 	affirm(isTour());
 }
 
@@ -302,6 +313,11 @@ const C2EdgeTour& C2EdgeTour::operator=(const C2EdgeTour& src)
 	return *this;
 }
 
+bool C2EdgeTour::operator<(const C2EdgeTour& another) 
+{
+  return getLength() < another.getLength();
+}
+
 void C2EdgeTour::constructTabuEdge(C2EdgeTour* tabu)
 {
 	int     i, ep;
@@ -420,7 +436,6 @@ int C2EdgeTour::getEndPoint(int v)
 	return ep;
 }
 
-
 static int compareMin(const void* a1, const void* a2)
 {
 	IntTriple* b1 = (IntTriple*)a1;
@@ -430,85 +445,3 @@ static int compareMin(const void* a1, const void* a2)
 	if( b1->i3 > b2->i3) return 1;
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
