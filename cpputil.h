@@ -2,9 +2,7 @@
 #define _CPPUTIL_H_
 
 #include <sys/types.h>
-#include <chrono>
 using namespace std;
-using namespace chrono;
 
 	/** @name 작지만 유용한 클래스 */ 
 	//@{            Start of DOC++ block
@@ -13,13 +11,13 @@ class CTimer
 {
 private:
 		// 기록을 시작한 시간
-  system_clock::time_point m_start;
+  time_t m_start;
 		// 기록을 시작할 때에, times()의 리턴값
-  system_clock::time_point m_elapsedStart;
+  time_t m_elapsedStart;
 		// 마지막으로 기록을 중단한 시간
-  system_clock::time_point m_end;
+  time_t m_end;
 		// 기록을 중단할 때에, times()의 리턴값
-  system_clock::time_point m_elapsedEnd;
+  time_t m_elapsedEnd;
 
 public:
 		// 시간 기록 시작

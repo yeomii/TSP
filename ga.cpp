@@ -3,7 +3,6 @@
 #include <time.h>
 #include <assert.h>
 #include <vector>
-#include <chrono>
 #include "lk.h"
 #include "cpputil.h"
 #include "ga.h"
@@ -12,7 +11,6 @@
 #define affirm(x)    assert(x)
 
 using namespace std;
-using namespace chrono;
 
 extern long long gTimeLimit;
 extern vector<C2EdgeTour> Population = vector<C2EdgeTour>();
@@ -24,17 +22,16 @@ const int MAXPSIZE = 100;
 int Psize = 50;
 int Generation = 0;
 
-system_clock::time_point BeginTime;
+time_t BeginTime;
 
 inline long long elapsedTime()
 {
-  auto now = system_clock::now();
-  return duration_cast<seconds>(now - BeginTime).count();
+  return time(0) - BeginTime;
 }
 
 inline void startTimer()
 {
-  BeginTime = system_clock::now();
+  BeginTime = time(0);
 }
 
 void GA()

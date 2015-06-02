@@ -8,6 +8,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include "cpputil.h"
 
@@ -21,21 +22,21 @@
 	/************************ CTimer class *****************************/
 void CTimer::start()
 {
-  m_start = system_clock::now();
-  m_elapsedStart = system_clock::now();
+  m_start = time(0);
+  m_elapsedStart = time(0);
 }
 
 float CTimer::stop(int want)
 {
 	float interval, clk_tick;
 
-  m_end = system_clock::now();
-  m_elapsedEnd = system_clock::now();
+  m_end = time(0);
+  m_elapsedEnd = time(0);
 
 	if( want == 0) 
-		interval = duration_cast<milliseconds>(m_end - m_start).count();
+		interval = (float)(m_end - m_start);
 	else
-    interval = duration_cast<milliseconds>(m_end - m_start).count();
+    interval = (float)(m_end - m_start);
 
 	return interval;
 }
@@ -133,7 +134,7 @@ double CStat::getGrpStd()
 	double avg, std;
 
 	avg = getAvg();	std = getStd();
-	return std/sqrt(m_count);
+	return std/sqrt((double)m_count);
 }
 
 double CStat::getAbovePercent(double base)
