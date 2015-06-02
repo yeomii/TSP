@@ -159,7 +159,7 @@ public:
 		// src 투어를 이 투어에 복사한다.
 	const C2EdgeTour& operator=(const C2EdgeTour& src);
     // 정렬용
-  bool C2EdgeTour::operator<(const C2EdgeTour& another);
+  bool operator<(const C2EdgeTour& another);
 
 		/* 도시 cur와 end사이에 city가 있는가?.
 		   투어를 prev에서 cur로 가는 방향성 투어라고 가정할 때,

@@ -1,6 +1,7 @@
 #ifndef TSPLIB_IO_H
 #define TSPLIB_IO_H
 
+#include <stdio.h>
 	/**@name TSPLIB 입출력 루틴.
 	   \URL[TSPLIB]{ftp://softlib.rice.edu/pub/tsplib} 파일을 읽어 TSP
 	   인스턴스를 구성하고, 그 것을 접근하는 데 이용되는 변수와 함수 집합을
@@ -71,7 +72,7 @@ extern int*            gNNI;
 		@param graphname 인스턴스 파일이름. 확장자는 .tsp 또는 .atsp가 되어야
 		한다.  */
 
-void ReadTspFile(char *graphname);
+void ReadTspFile(const char *graphname);
 	/** 가장 가까운 이웃 도시들의 배열을 만든다.
 		@param numNN 한 도시에 대해서 만들어질 이웃 도시들의 수
 		@param is_quad 이웃 도시들을 계산할 때 도시들을 4개의 구역으로 나누어서

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <assert.h>
+#include <math.h>
 #include "tsplib_io.h"
 #include "ga.h"
 

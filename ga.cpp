@@ -6,14 +6,14 @@
 #include "lk.h"
 #include "cpputil.h"
 #include "ga.h"
-#include <iostream>
 
 #define affirm(x)    assert(x)
 
 using namespace std;
 
 extern long long gTimeLimit;
-extern vector<C2EdgeTour> Population = vector<C2EdgeTour>();
+
+vector<C2EdgeTour> Population = vector<C2EdgeTour>();
 
 C2EdgeTour *Record;
 
@@ -38,7 +38,7 @@ void GA()
 {
   /* initialize */
   CLK* lk = new CLK(gNumCity, gNumNN);
-  Population.swap(vector<C2EdgeTour>());
+  Population.clear();
   Record = new C2EdgeTour(gNumCity);
 
   /* generate initial random population */
@@ -74,6 +74,9 @@ void GA()
     delete c;
 
     Generation++;
+
+		if (Generation % 100 == 0)
+			printf("%lld %lld\n", elapsedTime(), gTimeLimit);
   }
 
 }
@@ -102,12 +105,15 @@ int main(int argc, char* argv[])
 {
   init();
 
-  ReadTspFile("cycle.in"); 
+  const char* inputFileName = "cycle.in";
+  const char* outputFileName = "cycle.out";
+
+  ReadTspFile(inputFileName); 
   ConstructNN(20);
 
   GA();
 
-  writeAnswer("cycle.out");
+  writeAnswer(outputFileName);
 
   return 0;
 }

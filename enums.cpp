@@ -1,8 +1,8 @@
 #include "ga.h"
 
-string getString(SelectionType selectionType)
+const char* getString(SelectionType selectionType)
 {
-  static string dic[] = {
+  static const char* dic[] = {
     "Random",
     "Tournament"
   };
@@ -10,9 +10,9 @@ string getString(SelectionType selectionType)
   return dic[(unsigned char)selectionType];
 }
 
-string getString(CrossoverType crossoverType)
+const char* getString(CrossoverType crossoverType)
 {
-  static string dic[] = {
+  static const char* dic[] = {
     "PMX",
     "EdgeRecombination"
   };
@@ -20,9 +20,9 @@ string getString(CrossoverType crossoverType)
   return dic[(unsigned char)crossoverType];
 }
 
-string getString(ReplacementType replacementType)
+const char* getString(ReplacementType replacementType)
 {
-  static string dic[] = {
+  static const char* dic[] = {
     "Worst",
     "Preselection",
     "GBA"

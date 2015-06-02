@@ -4,7 +4,6 @@
 
 const double EPS = 1e-9;
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -105,7 +104,7 @@ void initDistanceCache(int num_city, int num_nn);
 
 	/************************** Fuction Definition ***************/
 	/****************** Reading File related ********************/
-void ReadTspFile(char* graphname)
+void ReadTspFile(const char* graphname)
 {
 	FILE *fd;
 	char dummy[256], graph[256], *tsplib_dir;

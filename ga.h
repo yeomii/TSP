@@ -2,9 +2,7 @@
 #define __GA_H__
 
 #include <vector>
-#include <string>
 #include "lk.h"
-using namespace std;
 
 /* Enums */
 
@@ -27,9 +25,9 @@ enum ReplacementType
   GBA = 2
 };
 
-string getString(SelectionType);
-string getString(CrossoverType);
-string getString(ReplacementType);
+const char* getString(SelectionType);
+const char* getString(CrossoverType);
+const char* getString(ReplacementType);
 
 /* Params */
 
