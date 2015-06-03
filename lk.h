@@ -7,7 +7,7 @@
 #include "cpputil.h"
 
 	/// 1이면 속도가 빨라지는 대신에 질이 조금 떨어진다.
-#define LK_MORE_SPEED        1
+#define LK_MORE_SPEED        0
 #define LK_DEPTH             40
 
 	/////////////////////////////////////////////////////////////////////

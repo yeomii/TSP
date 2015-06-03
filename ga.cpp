@@ -21,18 +21,7 @@ const int MAXPSIZE = 100;
 
 int Psize = 50;
 int Generation = 0;
-
-time_t BeginTime;
-
-inline long long elapsedTime()
-{
-  return time(0) - BeginTime;
-}
-
-inline void startTimer()
-{
-  BeginTime = time(0);
-}
+int change = 0;
 
 void GA()
 {
@@ -50,22 +39,36 @@ void GA()
     Population.push_back(tour);
   }
 
+  gTimeLimit = 20;
+  double milliTimeLimit = gTimeLimit * 1000;
   /* ga loop */
-  while (elapsedTime() <= gTimeLimit - 1)
+  while (timerRead(0) <= milliTimeLimit - 500)
   {
     C2EdgeTour *p1, *p2, *c;
 
+    timerStart(1);
     selection(p1, p2);
-    
-    crossover(p1, p2, c);
-    
-    mutation(c, elapsedTime());
-    
-    lk->run(c);
+    timerStop(1);
 
+    timerStart(2);
+    crossover(p1, p2, c);
+    timerStop(2);
+
+    timerStart(3);
+    mutation(c, timerRead(0) / milliTimeLimit);
+    timerStop(3);
+
+    timerStart(4);
+    lk->run(c);
+    timerStop(4);
+
+    timerStart(5);
     c->evaluate();
-    
+    timerStop(5);
+
+    timerStart(6);
     replacement(p1, p2, c);
+    timerStop(6);
 
     // renew best
     if (Record->getLength() == -1 || c->getLength() < Record->getLength())
@@ -75,10 +78,43 @@ void GA()
 
     Generation++;
 
-		if (Generation % 100 == 0)
-			printf("%lld %lld\n", elapsedTime(), gTimeLimit);
+    if (Generation % 100 == 0)
+    {
+      printf("%.0lf ", timerRead(0));
+      printStats(stdout);
+      double bestLength = Population[0].getLength();
+      if (Population[0].getLength() == Population[Population.size() / 4 * 3].getLength())
+      {
+        printf("population changing...\n", change);
+        change++;
+        for (int i = 0; i < Psize; i++)
+        {
+          if (Population[i].getLength() != bestLength)
+            break;
+          Population[i].makeRandomTour();
+          Population[i].evaluate();
+        }
+      }
+      if (bestLength == Population[Population.size() / 2].getLength())
+      {
+        Params.selectionType = Random;
+        Params.mutation_t = 0.15;
+      }
+      else if (bestLength == Population[Population.size() * 3 / 4].getLength())
+      {
+        Params.selectionType = Random;
+        Params.mutation_t = 0.3;
+      }
+      else
+      {
+        Params.selectionType = Tournament;
+        Params.mutation_t = 0.05;
+      }
+    }
   }
-
+  printf("%d ", change);
+  printf("%lf %lf %lf %lf %lf %lf", timerRead(1), timerRead(2), timerRead(3), 
+    timerRead(4), timerRead(5), timerRead(6));
 }
 
 void writeAnswer(const char* filename)
@@ -96,7 +132,8 @@ void writeAnswer(const char* filename)
 
 void init()
 {
-  startTimer();
+  timerInit();
+  timerStart(0);
   srand(time(0));
   initParameters(NULL);
 }

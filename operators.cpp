@@ -187,12 +187,11 @@ void uniformMutation(C2EdgeTour* c, double threshold)
 }
 
 
-void mutation(C2EdgeTour* c, long long elapsedTime)
+void mutation(C2EdgeTour* c, double timePortion)
 {
   double th = Params.mutation_t;
   if (Params.mutation_b > 1)
   {
-    double timePortion = ((double)elapsedTime / (double)gTimeLimit);
     th = 1 - pow(th, pow(1 - timePortion, Params.mutation_b));
     th *= Params.mutation_t;
   }

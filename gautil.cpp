@@ -1,5 +1,18 @@
+#include <algorithm>
+#include <chrono>
 #include "ga.h"
 
+#define NUM_TIMERS    64
+
+using namespace std;
+using namespace chrono;
+
+static system_clock::time_point t_start[NUM_TIMERS];
+static double t_elapsed[NUM_TIMERS];
+static unsigned t_count[NUM_TIMERS];
+
+extern int Generation;
+extern vector<C2EdgeTour> Population;
 Parameter Params;
 
 void initParameters(const char *fname)
@@ -8,9 +21,9 @@ void initParameters(const char *fname)
   {
     Params.selectionType = Tournament;
     Params.tournament_k = 5;
-    Params.tournament_t = 0.7;
+    Params.tournament_t = 0.65;
     Params.crossoverType = PMX;
-    Params.mutation_t = 0.05;
+    Params.mutation_t = 0.15;
     Params.mutation_b = 1;
     Params.replacementType = GBA;
     Params.generationGap = 0;
@@ -43,4 +56,79 @@ void printParameters(FILE *fout)
   fprintf(fout, "Replacement: %s\n", getString(Params.replacementType));
   fprintf(fout, "generationGap: %lf\n", Params.generationGap);
   fprintf(fout, "printFrequency: %d\n", Params.printFreq);
+}
+
+void printStats(FILE *file){
+  if (Generation % Params.printFreq != 0)
+    return;
+  int Psize = Population.size();
+
+  sort(Population.begin(), Population.end());
+
+  double sum = 0.0;
+  for (int i = 0; i < Psize; i++) {
+    sum += Population[i].getLength();
+  }
+  double mean = sum / Psize;
+
+  double sq_sum = 0.0;
+  for (int i = 0; i < Psize; i++) {
+    sq_sum += Population[i].getLength() * Population[i].getLength();
+  }
+  double stdev = sqrt(sq_sum / Psize - mean * mean);
+
+  fprintf(file, "gen:%d avg:%.2f stdev:%.2f q0:%.2f q1:%.2f q2:%.2f q3:%.2f q4:%.2f\n",
+    Generation, mean, stdev,
+    Population[0].getLength(), Population[Psize / 4].getLength(), 
+    Population[Psize / 2].getLength(), Population[3 * Psize / 4].getLength(), 
+    Population[Psize - 1].getLength());
+}
+
+static inline system_clock::time_point getTime()
+{
+  return system_clock::now();
+}
+
+
+void timerInit() 
+{
+  int i;
+  for (i = 0; i < NUM_TIMERS; i++) {
+    t_elapsed[i] = 0.0;
+    t_count[i] = 0;
+  }
+}
+
+
+void timerClear(int i) 
+{
+  t_elapsed[i] = 0.0;
+  t_count[i] = 0;
+}
+
+
+void timerStart(int i) 
+{
+  t_start[i] = getTime();
+}
+
+
+void timerStop(int i) 
+{
+  t_elapsed[i] += duration_cast<milliseconds>(getTime() - t_start[i]).count();
+  t_count[i]++;
+}
+
+
+double timerRead(int i) 
+{
+  t_elapsed[i] += duration_cast<milliseconds>(getTime() - t_start[i]).count();
+  t_start[i] = getTime();
+  return t_elapsed[i];
+}
+
+
+unsigned timerCount(int i) 
+{
+  return t_count[i];
 }
