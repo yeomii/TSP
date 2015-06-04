@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <chrono>
+#include <math.h>
 #include "ga.h"
 
 #define NUM_TIMERS    64
@@ -21,7 +22,7 @@ void initParameters(const char *fname)
   {
     Params.selectionType = Tournament;
     Params.tournament_k = 5;
-    Params.tournament_t = 0.65;
+    Params.tournament_t = 0.7;
     Params.crossoverType = PMX;
     Params.mutation_t = 0.15;
     Params.mutation_b = 1;
@@ -42,6 +43,7 @@ void initParameters(const char *fname)
       &Params.replacementType,
       &Params.generationGap,
       &Params.printFreq);
+		fclose(fin);
   }
 }
 
@@ -58,30 +60,30 @@ void printParameters(FILE *fout)
   fprintf(fout, "printFrequency: %d\n", Params.printFreq);
 }
 
-void printStats(FILE *file){
+void printStats(FILE *file, vector<C2EdgeTour>& population){
   if (Generation % Params.printFreq != 0)
     return;
-  int Psize = Population.size();
+  int Psize = population.size();
 
-  sort(Population.begin(), Population.end());
+  sort(population.begin(), population.end());
 
   double sum = 0.0;
   for (int i = 0; i < Psize; i++) {
-    sum += Population[i].getLength();
+    sum += population[i].getLength();
   }
   double mean = sum / Psize;
 
   double sq_sum = 0.0;
   for (int i = 0; i < Psize; i++) {
-    sq_sum += Population[i].getLength() * Population[i].getLength();
+    sq_sum += population[i].getLength() * population[i].getLength();
   }
   double stdev = sqrt(sq_sum / Psize - mean * mean);
 
   fprintf(file, "gen:%d avg:%.2f stdev:%.2f q0:%.2f q1:%.2f q2:%.2f q3:%.2f q4:%.2f\n",
     Generation, mean, stdev,
-    Population[0].getLength(), Population[Psize / 4].getLength(), 
-    Population[Psize / 2].getLength(), Population[3 * Psize / 4].getLength(), 
-    Population[Psize - 1].getLength());
+    population[0].getLength(), population[Psize / 4].getLength(), 
+    population[Psize / 2].getLength(), population[3 * Psize / 4].getLength(), 
+    population[Psize - 1].getLength());
 }
 
 static inline system_clock::time_point getTime()

@@ -5,38 +5,38 @@
 #include "ga.h"
 
 extern long long gTimeLimit;
-extern vector<C2EdgeTour> Population;
+extern int Psize;
 extern Parameter Params;
 
 #pragma region SELECTION
 
-void randomSelection(C2EdgeTour*& p1, C2EdgeTour*& p2)
+void randomSelection(C2EdgeTour*& p1, C2EdgeTour*& p2, vector<C2EdgeTour>& pop)
 {
-  int first = rand() % Population.size();
-  int gap = rand() % (Population.size() - 2) + 1;
-  int second = (first + gap) % Population.size();
+  int first = rand() % pop.size();
+  int gap = rand() % (pop.size() - 2) + 1;
+  int second = (first + gap) % pop.size();
 
-  p1 = &Population[first];
-  p2 = &Population[second];
+  p1 = &pop[first];
+  p2 = &pop[second];
 }
 
-void tournamentSelection(C2EdgeTour*& p1, C2EdgeTour*& p2)
+void tournamentSelection(C2EdgeTour*& p1, C2EdgeTour*& p2, vector<C2EdgeTour>& pop)
 {
   int candidates = 1 << Params.tournament_k;
-  int *selected = new int[Population.size()];
+  int *selected = new int[pop.size()];
 
-  for (int i = 0; i < Population.size(); i++)
+  for (int i = 0; i < pop.size(); i++)
     selected[i] = i;
   for (int i = 0; i < candidates; i++)
-    swap(selected[i], selected[i + rand() % (Population.size() - i)]);
+    swap(selected[i], selected[i + rand() % (pop.size() - i)]);
 
   for (int step = 0; step < Params.tournament_k - 1; step++)
   {
     candidates /= 2;
     for (int i = 0; i < candidates; i++)
     {
-      double f1 = Population[selected[2 * i]].getLength();
-      double f2 = Population[selected[2 * i + 1]].getLength();
+      double f1 = pop[selected[2 * i]].getLength();
+      double f2 = pop[selected[2 * i + 1]].getLength();
       double r = ((double)rand() / (RAND_MAX));
       if (r < Params.tournament_t)
         selected[i] = (f1 < f2) ? selected[2 * i] : selected[2 * i + 1];
@@ -45,23 +45,23 @@ void tournamentSelection(C2EdgeTour*& p1, C2EdgeTour*& p2)
     }
 
   }
-  p1 = &Population[selected[0]];
-  p2 = &Population[selected[1]];
+  p1 = &pop[selected[0]];
+  p2 = &pop[selected[1]];
 
   delete[] selected;
 
   assert(p1 != p2);
 }
 
-void selection(C2EdgeTour*& p1, C2EdgeTour*& p2)
+void selection(C2EdgeTour*& p1, C2EdgeTour*& p2, vector<C2EdgeTour>& population)
 {
   switch (Params.selectionType)
   {
   case Tournament:
-    tournamentSelection(p1, p2);
+    tournamentSelection(p1, p2, population);
     break;
   default:
-    randomSelection(p1, p2);
+    randomSelection(p1, p2, population);
     break;
   }
 }
@@ -166,7 +166,7 @@ void changeSwap(int *order, int idx)
 void uniformMutation(C2EdgeTour* c, double threshold)
 {
   c->convertToOrder(_c, gNumCity);
-  for (int i = 0; i < Population.size(); i++){
+  for (int i = 0; i < Psize; i++){
     double r = (double)rand() / RAND_MAX;
     if (r < threshold){
       int sel = rand() % 3;
@@ -203,10 +203,10 @@ void mutation(C2EdgeTour* c, double timePortion)
 
 #pragma region REPLACEMENT
 
-void worstReplacement(C2EdgeTour* c)
+void worstReplacement(C2EdgeTour* c, vector<C2EdgeTour>& pop)
 {
   vector<C2EdgeTour>::iterator worstElem = 
-    max_element(Population.begin(), Population.end());
+    max_element(pop.begin(), pop.end());
   
   *worstElem = *c;
 }
@@ -219,10 +219,10 @@ void preselection(C2EdgeTour* p1, C2EdgeTour* p2, C2EdgeTour* c)
     *p2 = *c;
 }
 
-void gba(C2EdgeTour* p1, C2EdgeTour* p2, C2EdgeTour* c)
+void gba(C2EdgeTour* p1, C2EdgeTour* p2, C2EdgeTour* c, vector<C2EdgeTour>& pop)
 {
   if (p1->getLength() < c->getLength() && p2->getLength() < c->getLength())
-    worstReplacement(c);
+    worstReplacement(c, pop);
   else
     preselection(p1, p2, c);
 }
@@ -234,18 +234,18 @@ void gba(C2EdgeTour* p1, C2EdgeTour* p2, C2EdgeTour* c)
    Replacement를 호출할 때는 다음과 같은 상태를 가정한다.
      - p1, p2, c는 이미 evaluate 된 상태여야 한다.
  */
-void replacement(C2EdgeTour* p1, C2EdgeTour* p2, C2EdgeTour* c)
+void replacement(C2EdgeTour* p1, C2EdgeTour* p2, C2EdgeTour* c, vector<C2EdgeTour>& population)
 {
   switch (Params.replacementType)
   {
   case Worst:
-    worstReplacement(c);
+    worstReplacement(c, population);
     break;
   case Preselection:
     preselection(p1, p2, c);
     break;
   case GBA:
-    gba(p1, p2, c);
+    gba(p1, p2, c, population);
     break;
   }
 }

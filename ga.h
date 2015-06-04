@@ -51,7 +51,7 @@ extern Parameter Params;
 
 void initParameters(const char* fname);
 void printParameters(FILE* fout);
-void printStats(FILE* file);
+void printStats(FILE* file, vector<C2EdgeTour>& population);
 
 void timerInit();
 void timerClear(int i);
@@ -62,11 +62,9 @@ unsigned timerCount(int i);
 
 /* GA Operators */
 
-extern vector<C2EdgeTour> Population;
-
-void selection(C2EdgeTour*& p1, C2EdgeTour*& p2);
+void selection(C2EdgeTour*& p1, C2EdgeTour*& p2, vector<C2EdgeTour>& population);
 void crossover(C2EdgeTour* p1, C2EdgeTour* p2, C2EdgeTour*& c);
 void mutation(C2EdgeTour* c, double timePortion);
-void replacement(C2EdgeTour* p1, C2EdgeTour* p2, C2EdgeTour* c);
+void replacement(C2EdgeTour* p1, C2EdgeTour* p2, C2EdgeTour* c, vector<C2EdgeTour>& population);
 
 #endif

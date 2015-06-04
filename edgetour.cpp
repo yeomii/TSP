@@ -313,7 +313,7 @@ const C2EdgeTour& C2EdgeTour::operator=(const C2EdgeTour& src)
 	return *this;
 }
 
-bool C2EdgeTour::operator<(const C2EdgeTour& another) 
+bool C2EdgeTour::operator<(const C2EdgeTour& another) const
 {
   return getLength() < another.getLength();
 }
